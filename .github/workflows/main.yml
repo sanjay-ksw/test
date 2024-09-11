@@ -1,0 +1,37 @@
+name: Deploy Node.js to FTP via cPanel
+
+on:
+  push:
+    branches:
+      - main  # Triggers on push to the 'main' branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # Specify the version of Node.js
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build project (if applicable)
+      run: npm run build  # Modify if you have a custom build script
+
+    - name: Deploy to FTP server
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: ${{ secrets.SECRET_SERVER }}
+        username: ${{ secrets.SECRET_USERNAME }}
+        password: ${{ secrets.SECRET_PASSWORD }}
+        local-dir: './dist'  # Path to the build files, change if needed
+        server-dir: '/'  # Path on your cPanel server
+
+    - name: Post deployment actions
+      run: echo "Deployment completed successfully!"
